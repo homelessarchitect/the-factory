@@ -25,10 +25,15 @@ def get_dispatcher(workflow_slug: str) -> Dispatcher | None:
 
 def _build_mcp_app(workflow_slug: str, register_fn: Any) -> Starlette:
     """Build an MCP sub-app for a single workflow."""
+    from mcp.server.fastmcp.server import TransportSecuritySettings
+
     mcp = FastMCP(
         f"The Architect — {workflow_slug}",
         stateless_http=True,
         streamable_http_path="/",
+        transport_security=TransportSecuritySettings(
+            enable_dns_rebinding_protection=False,
+        ),
     )
     register_fn(mcp)
     return mcp.streamable_http_app()
