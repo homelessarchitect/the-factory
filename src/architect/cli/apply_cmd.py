@@ -59,8 +59,13 @@ async def _apply(workflow_path: str, *, force: bool = False) -> None:
             click.echo(f"Generating schemas...    done  {entity_count} entities")
             click.echo(f"Generating tools...      done  {tools_count} CRUD tools")
 
-            # Import generated models and create domain tables
+            # Import generated models and built-in modules, then create all tables
             click.echo("Creating tables...       ", nl=False)
+            import architect.modules.approvals.models  # noqa: F401
+            import architect.modules.api_keys.models  # noqa: F401
+            import architect.modules.budgets.models  # noqa: F401
+            import architect.modules.credentials.models  # noqa: F401
+            import architect.modules.executions.models  # noqa: F401
             for entity_name in entity_names:
                 try:
                     importlib.import_module(
