@@ -79,11 +79,28 @@ async def _apply(workflow_path: str) -> None:
                 else []
             )
 
+            # Store dispatcher definitions for serve-time reconstruction
+            dispatcher_defs = [
+                {
+                    "action_type": d.action_type,
+                    "handler": d.handler,
+                    "provider": d.provider,
+                    "provider_action": d.provider_action,
+                }
+                for d in workflow.dispatchers
+            ]
+
+            # Store pipeline count for tools_count
+            pipeline_tool_count = len(workflow.pipelines)
+
             state = await service.create_version(
                 workflow_slug=workflow.slug,
                 schema_hash=current_hash,
-                entities={"names": entity_names},
-                tools_count=tools_count,
+                entities={
+                    "names": entity_names,
+                    "dispatchers": dispatcher_defs,
+                },
+                tools_count=tools_count + pipeline_tool_count,
                 tables_list=tables,
                 providers=providers,
             )
